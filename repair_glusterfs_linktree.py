@@ -51,7 +51,7 @@ def walk_tree(pgfid, pgpath):
             except Exception,e:
                 print "Missing link for %s in %s" % (direntry, pgpath) 
                 print "You should probably run "
-                print "ln -s %s %s" % (pgfid_path, ln_full)
+                print "ln -s '%s' '%s'" % (pgfid_path, ln_full)
             
             
 if len(sys.argv) > 1:
