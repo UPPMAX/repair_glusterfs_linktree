@@ -71,7 +71,7 @@ def walk_link_tree(pgfid, pgpath):
                                                                                            os.path.join(gfid_to_path(ltl),                                                              
                                                                                                         ltr),                                                                           
                                                                                            pgfid_path,                                                                                  
-                                                                                           os.path.join(pgpath,                                                                         
+                                                                                           os.path.join(pgpath[43:], 
                                                                                                         direntry))      
 
 
