@@ -6,6 +6,7 @@
 #
 
 import os
+import os.path
 import xattr
 import base64
 import stat
@@ -19,6 +20,25 @@ def format_gfid(gfid):
     linkname = "%s/%s/%s-%s-%s-%s-%s" % (s[0:2], s[2:4], s[0:8], s[8:12], s[12:16], s[16:20], s[20:32])
 
     return linkname
+
+def gfid_to_path(gfid_string):
+ 
+    linkdata = os.readlink("%s/%s/%s" % (gfid_string[0:2], gfid_string[2:4], gfid_string))
+
+    rightmost = os.path.basename(linkdata)
+    uplevel = os.path.dirname(linkdata)
+
+    if uplevel == '../../00/00/00000000-0000-0000-0000-000000000001':
+        return rightmost
+    else:
+        # Recurse 
+        return os.path.join(
+            gfid_to_path(
+                os.path.basename(
+                    uplevel
+                )),
+        rightmost)
+
 
 def walk_link_tree(pgfid, pgpath):
     l = os.listdir(pgpath)
@@ -42,7 +62,18 @@ def walk_link_tree(pgfid, pgpath):
                     links_to = os.readlink(ln)
 
                     if links_to != pgfid_path:
-                        print "Unexpected: %s links to %s not %s as expected" % (ln_full, links_to, pgfid_path)
+
+                        ltr = os.path.basename(links_to)
+                        ltl = os.path.basename(os.path.dirname(links_to))
+
+                        print "Unexpected: %s links to %s (%s) not %s (%s) as expected" % (ln_full,                                                                                     
+                                                                                           links_to,                                                                                    
+                                                                                           os.path.join(gfid_to_path(ltl),                                                              
+                                                                                                        ltr),                                                                           
+                                                                                           pgfid_path,                                                                                  
+                                                                                           os.path.join(pgpath,                                                                         
+                                                                                                        direntry))      
+
 
                 else:
                     print "Unexpected: %s is not a symbolic link" % ln_full
